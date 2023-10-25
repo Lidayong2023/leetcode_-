@@ -1,0 +1,29 @@
+n 的 惩罚数 定义为所有满足以下条件 i 的数的平方和：
+
+1 <= i <= n
+i * i 的十进制表示的字符串可以分割成若干连续子字符串，且这些子字符串对应的整数值之和等于 i 。
+
+解决方法：递归调用
+
+class Solution {
+public:
+    int punishmentNumber(int n) {
+        int res = 0;
+        for(int i = 1; i <= n; ++i){
+            if(punish_num(i*i,i)){
+                res += i*i;
+            }
+        }
+        return res;
+    }
+
+    bool punish_num(int temp, int i){
+        if(temp == i) return true;
+        int d=10;
+        while(temp>=d && temp%d <= i){
+            if (punish_num(temp/d,i-(temp%d))) return true;
+            d*=10;
+        }
+        return false;
+    }
+};
