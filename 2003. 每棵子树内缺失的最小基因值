@@ -1,0 +1,56 @@
+有一棵根节点为 0 的 家族树 ，总共包含 n 个节点，节点编号为 0 到 n - 1 。给你一个下标从 0 开始的整数数组 parents ，其中 parents[i] 是节点 i 的父节点。由于节点 0 是 根 ，所以 parents[0] == -1 。
+
+总共有 105 个基因值，每个基因值都用 闭区间 [1, 105] 中的一个整数表示。给你一个下标从 0 开始的整数数组 nums ，其中 nums[i] 是节点 i 的基因值，且基因值 互不相同 。
+
+请你返回一个数组 ans ，长度为 n ，其中 ans[i] 是以节点 i 为根的子树内 缺失 的 最小 基因值。
+
+节点 x 为根的 子树 包含节点 x 和它所有的 后代 节点。
+
+
+class Solution {
+public:
+    vector<int> smallestMissingValueSubtree(std::vector<int>& parents, std::vector<int>& nums) {
+        int n = nums.size(), idx = -1;
+        vector<int> res(n, 1);
+        vector<vector<int>> g(n);
+        // 找节点 1, 建图
+        for (int i = 1; i < n; i++) {
+            //if (nums[i] == 1) idx = i;
+            g[parents[i]].push_back(i);
+        }
+        for (int i = 0; i < n; i++) {
+            if (nums[i] == 1) {
+                idx = i;
+                break;
+            }
+        }
+        // 若 nums 中没 1
+        if (idx == -1) return res;
+        
+        //dfs
+        unordered_set<int> geneSet; //记录每次dfs的遍历的值
+        vector<int> visited(n, 0);
+        function<void(int)> dfs = [&](int node) {
+            if (visited[node]) {
+                return;
+            }
+            visited[node] = 1;
+            geneSet.insert(nums[node]); 
+            for (auto child : g[node]) {
+                dfs(child);
+            }
+        };
+
+        //从NUM值为1的节点开始，并且其父节点缺失基因只会更大
+        int iNode = 1;
+        while(idx != -1){
+            dfs(idx);
+            while (geneSet.count(iNode)) {
+                iNode++;
+            }
+            res[idx] = iNode;
+            idx = parents[idx];
+        }
+        return res;
+    }
+};
